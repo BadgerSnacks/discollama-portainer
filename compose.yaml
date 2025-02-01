@@ -1,21 +1,52 @@
-version: '3'
 services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    restart: unless-stopped
+    command: ['serve']
+    ports:
+      - 11434:11434
+    volumes:
+      - YOUR FILE DIRECTORY:/root/.ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    networks:
+      discollama_network:
+        ipv4_address: 172.19.0.4
+
   discollama:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: FILE DIRECTORY THAT DOCKERFILE IS LOCATED
     restart: always
     command: ['--redis-host', 'redis']
+    volumes:
+      - YOUR FILE DIRECTORY 
     environment:
       - DISCORD_TOKEN
-      - OLLAMA_HOST
+      - OLLAMA_HOST=http://ollama:11434
       - OLLAMA_PORT=11434
-      - OLLAMA_MODEL=mike/discollama
-
+      - OLLAMA_MODEL=llama3.2
+    depends_on:
+      - ollama
+    networks:
+      discollama_network:
+        ipv4_address: 172.19.0.3
+      
   redis:
     image: redis/redis-stack-server:latest
     restart: always
     volumes:
       - /data
     ports:
-      - 6379
+     - 6379
+    networks:
+      discollama_network:
+        ipv4_address: 172.19.0.2
+
+networks:
+  discollama_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.19.0.0/24
