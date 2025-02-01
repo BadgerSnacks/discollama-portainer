@@ -128,7 +128,7 @@ class Discollama:
     sb = io.StringIO()
 
     t = datetime.now()
-    async for part in await self.ollama.generate(model=self.model, prompt=content, context=context, keep_alive=-1, stream=True):
+    async for part in self.ollama.generate(model=self.model, prompt=content, context=context, keep_alive=-1, stream=True):
       sb.write(part['response'])
 
       if part['done'] or datetime.now() - t > timedelta(seconds=1):
@@ -172,7 +172,7 @@ def main():
   intents.message_content = True
 
   Discollama(
-    ollama.AsyncClient(),
+    ollama.AsyncClient("http://ollama:11434"),
     discord.Client(intents=intents),
     redis.Redis(host=args.redis_host, port=args.redis_port, db=0, decode_responses=True),
     model=args.ollama_model,
