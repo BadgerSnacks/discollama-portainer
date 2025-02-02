@@ -128,7 +128,7 @@ class Discollama:
     sb = io.StringIO()
 
     t = datetime.now()
-    async for part in self.ollama.generate(model=self.model, prompt=content, context=context, keep_alive=-1, stream=True):
+    async for part in await self.ollama.generate(model=self.model, prompt=content, context=context, keep_alive=-1, stream=True):
       sb.write(part['response'])
 
       if part['done'] or datetime.now() - t > timedelta(seconds=1):
@@ -159,7 +159,7 @@ class Discollama:
 def main():
   parser = argparse.ArgumentParser()
 
-  parser.add_argument('--ollama-model', default=os.getenv('OLLAMA_MODEL', 'llama2'), type=str)
+  parser.add_argument('--ollama-model', default=os.getenv('OLLAMA_MODEL', 'llama3.2'), type=str)
 
   parser.add_argument('--redis-host', default=os.getenv('REDIS_HOST', '127.0.0.1'), type=str)
   parser.add_argument('--redis-port', default=os.getenv('REDIS_PORT', 6379), type=int)
